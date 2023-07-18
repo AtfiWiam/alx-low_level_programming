@@ -1,5 +1,5 @@
 #include <stdio.h>
-
+#include "main.h"
 
 /**
  * main - Entry point of the program
@@ -8,11 +8,6 @@
  *
  * Return: 0 (success)
  */
-
-int _putchar(char c)
-{
-	return putchar(c);
-}
 
 int main(void)
 {
