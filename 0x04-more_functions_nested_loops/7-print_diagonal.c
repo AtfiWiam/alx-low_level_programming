@@ -1,10 +1,11 @@
 #include "main.h"
 
 /**
- * print_diagonal - check for a digit
+ * print_diagonal - draws a diagonal line
  * @n : number of \ to be printed
  * Return:void
  */
+
 void print_diagonal(int n)
 {
 	int i = 1;
