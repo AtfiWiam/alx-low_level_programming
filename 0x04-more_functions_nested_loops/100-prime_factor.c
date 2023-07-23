@@ -33,6 +33,7 @@ int main(void)
 	{
 		maxPrime = number;
 	}
+
 	printf("%ld\n", maxPrime);
 	return (0);
 }
