@@ -2,29 +2,29 @@
 
 /**
  * print_diagonal - check for a digit
- * @n : number of \\ to be printed
+ * @n : number of \ to be printed
  * Return:void
  */
-
 void print_diagonal(int n)
 {
-	int i = 0, b;
+	int i = 1;
 
-	while (i < n && n > 0)
+	if (n <= 0)
 	{
-		b = 0;
-		while (b < i)
+		_putchar('\n');
+		return;
+	}
+	while (i <= n)
+	{
+		int j = 1;
+
+		while (j < i)
 		{
-			_putchar(' ');
-			b++;
+			 _putchar(' ');
+			 j++;
 		}
 		_putchar('\\');
 		_putchar('\n');
 		i++;
-		if (i == 0)
-		{
-		_putchar('\n');
-		}
 	}
-	_putchar('\n');
 }
