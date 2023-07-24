@@ -16,14 +16,13 @@ int _strlen(char *s)
 		 length++;
 		 s++;
 	 }
-
 	 return (length);
 }
 
-
 /**
  * swap - function swap two characters.
- * @s: string value.
+ * @a: string value.
+ * @b: string value.
  * Return: void.
  */
 
