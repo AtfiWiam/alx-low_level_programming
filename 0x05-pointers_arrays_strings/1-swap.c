@@ -2,16 +2,16 @@
 
 /**
  * swap_int - C function that swaps the values of two integers.
- * @i: integer value.
- * @j: integer value.
+ * @a: integer value.
+ * @b: integer value.
  *
  * Return: void, no return.
  */
-void swap_int(int *i, int *j)
+void swap_int(int *a, int *b)
 {
-	int swap = *i;
+	int swap = *a;
 
-	*i = *j;
-	*j = swap;
+	*a = *b;
+	*b = swap;
 
 }
