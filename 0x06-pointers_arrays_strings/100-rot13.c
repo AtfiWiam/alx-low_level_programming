@@ -12,11 +12,12 @@ char *rot13(char *str)
 	char *ptr = str;
 	char alph[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	char rot_13[] = "nopqrstuvwxyzabcdefghijklmNOPQRSTUVWXYZABCDEFGHIJKLM";
+	int index;
 
 	while (*str)
 	{
-		int index = 0;
-	
+		index = 0;
+
 		while (alph[index] != '\0')
 		{
 			if (*str == alph[index])
