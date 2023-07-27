@@ -4,19 +4,34 @@
  * print_number - function that prints an integer.
  * @n: integer value.
  *
- * Return: nothing
+ * Return: nothing.
  */
-
 void print_number(int n)
 {
+	unsigned int a, b, c;
+
 	if (n < 0)
 	{
 		_putchar('-');
-		n = -n;
+		a = n * -1;
 	}
-	if ((n / 10) != 0)
+	else
 	{
-		print_number(n / 10);
+		a = n;
 	}
-	_putchar('0' + n % 10);
+
+	b = a;
+	c = 1;
+
+	while (b > 9)
+	{
+		b /= 10;
+		c *= 10;
+	}
+
+	for (; c >= 1; c /= 10)
+	{
+		_putchar(((a / c) % 10) + '\0');
+	}
 }
+
