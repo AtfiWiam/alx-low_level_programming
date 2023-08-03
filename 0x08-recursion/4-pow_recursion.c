@@ -5,7 +5,7 @@
  * to the power of y.
  * @x: integer value.
  * @y: integer value.
- * Return: value of x raised to the power of y, 
+ * Return: value of x raised to the power of y,
  * if y is lower than 0 return -1.
  */
 
