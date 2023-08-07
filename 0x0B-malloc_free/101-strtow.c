@@ -39,66 +39,48 @@ int count_words(char *str)
  */
 char **strtow(char *str)
 {
-	int word_count;
-	char **words;
-	int word_index = 0;
-	int word_length = 0;
-	int is_word = 0;
-	int i,j;
+	int wc = count_words(str), wi = 0, wl = 0, iw = 0, i, j;
+	char **w = (char **)malloc((wc + 1) * sizeof(char *));
 
-	if (str == NULL || *str == '\0')
+	if (!str || !*str) 
 		return (NULL);
-	word_count = count_words(str);
-	if (word_count == 0)
+	if (!w) 
 		return (NULL);
-	words = (char **)malloc((word_count + 1) * sizeof(char *));
-	if (words == NULL)
-		return (NULL);
-	for (i = 0; str[i] != '\0'; ++i)
+	for (i = 0; str[i]; ++i)
 	{
 		if (str[i] != ' ')
 		{
-			if (!is_word)
-			{
-				is_word = 1;
-				word_length = 0;
-			}
-			word_length++;
+			if (!iw) 
+				iw = wl = 1;
+			else wl++;
 		}
-		else if (is_word)
+		else if (iw)
 		{
-			words[word_index] = (char *)malloc((word_length + 1) * sizeof(char));
-			if (words[word_index] == NULL)
+			w[wi] = (char *)malloc((wl + 1) * sizeof(char));
+			if (!w[wi])
 			{
-				for (j = 0; j < word_index; ++j)
-				{
-					free(words[j]);
-				}
-				free(words);
+				for (j = 0; j < wi; ++j) 
+					free(w[j]);
+				free(w);
 				return (NULL);
 			}
-			strncpy(words[word_index], str + i - word_length, word_length);
-			words[word_index][word_length] = '\0';
-			word_index++;
-			is_word = 0;
+			strncpy(w[wi], str + i - wl, wl);
+			w[wi++][wl] = iw = 0;
 		}
 	}
-	if (is_word)
+	if (iw)
 	{
-		words[word_index] = (char *)malloc((word_length + 1) * sizeof(char));
-		if (words[word_index] == NULL)
+		w[wi] = (char *)malloc((wl + 1) * sizeof(char));
+		if (!w[wi])
 		{
-			for (j = 0; j < word_index; ++j)
-			{
-				free(words[j]);
-			}
-			free(words);
+			for (j = 0; j < wi; ++j) 
+				free(w[j]);
+			free(w);
 			return (NULL);
 		}
-		strncpy(words[word_index], str + strlen(str) - word_length, word_length);
-		words[word_index][word_length] = '\0';
-		word_index++;
+		strncpy(w[wi], str + strlen(str) - wl, wl);
+		w[wi][wl] = 0;
 	}
-	words[word_index] = NULL;
-	return (words);
+	w[wi] = NULL;
+	return (w);
 }
