@@ -6,7 +6,7 @@
  * @argc: number of command line argumments.
  * @argv: arguments passed to the program.
  *
- * Return: 0 (Success), 1 if more than 2 arguments.
+ * Return: 0 (Success), 1 if error.
  */
 
 int main(int argc, char *argv[])
@@ -19,6 +19,7 @@ int main(int argc, char *argv[])
 		printf("Error\n");
 		return (1);
 	}
+
 	printf("%d\n", num1 * num2);
 	return (0);
 }
