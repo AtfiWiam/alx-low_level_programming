@@ -10,26 +10,26 @@
  */
 char **strtow(char *str)
 {
-	int lenght = strlen(str), i, j = 0, k = 0;
-	char **split;
+	int len = strlen(str), i, j = 0, k = 0;
+	char **words;
 
-	split = malloc(sizeof(char) * 100);
+	words = malloc(sizeof(char) * 100);
 
-	for (i = 0; i <= lenght; i++)
+	for (i = 0; i <= len; i++)
 	{
 		if (str[i] == ' ' || str[i] == '\0')
 		{
-			split[j][k] = '\0';
+			words[j][k] = '\0';
 			j++;
 			k = 0;
 		}
 		else
 		{
-			split[i] = malloc((i + 2) * sizeof(char));
-			split[j][k] = str[i];
+			words[i] = malloc((i + 2) * sizeof(char));
+			words[j][k] = str[i];
 			k++;
 		}
 	}
 
-	return (split);
+	return (words);
 }
