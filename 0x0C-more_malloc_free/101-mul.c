@@ -36,22 +36,22 @@ int _isNumber(char *argv)
 
 /**
  *_calloc - allocate array of size x.
- * @x: number of elements.
+ * @nmemb: number of elements.
  * @size: size of element.
  * Return: pointer to array.
  **/
 
-void *_calloc(unsigned int x, unsigned int size)
+void *_calloc(unsigned int nmemb, unsigned int size)
 {
 	char *arr;
 	unsigned int i;
 
-	arr = malloc(size * x);
+	arr = malloc(size * nmemb);
 
 	if (arr == NULL)
 		return (NULL);
 
-	for (i = 0; i < (size * x); i++)
+	for (i = 0; i < (size * nmemb); i++)
 		arr[i] = '0';
 
 	return (arr);
@@ -61,7 +61,7 @@ void *_calloc(unsigned int x, unsigned int size)
  * _multiply - multiply two arrays.
  * @a1: first array.
  * @len1: length of array a1.
- * @a2: second array
+ * @a2: char
  * @a3: array for result.
  * @len3: length of array a3.
  * Return: pointer to result array.
@@ -134,8 +134,10 @@ int main(int argc, char *argv[])
 		}
 		exit(98);
 	}
-	for (len1 = 0; argv[1][len1]; len1++);
-	for (len2 = 0; argv[2][len2]; len2++);
+	for (len1 = 0; argv[1][len1]; len1++)
+		;
+	for (len2 = 0; argv[2][len2]; len2++)
+		;
 
 	lres = len1 + len2;
 	ares = _calloc(lres, sizeof(int));
