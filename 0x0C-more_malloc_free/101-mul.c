@@ -80,13 +80,13 @@ void *_multiply(char *a1, int len1, char a2, char *a3, int len3)
 		k--;
 	}
 
-		while (mul != 0)
-		{
-			mul += a3[k] - '0';
-			a3[k] = (mul % 10) + '0';
-			mul /= 10;
-			k--;
-		}
+	while (mul != 0)
+	{
+		mul += a3[k] - '0';
+		a3[k] = (mul % 10) + '0';
+		mul /= 10;
+		k--;
+	}
 
 	return (a3);
 }
@@ -113,7 +113,8 @@ void print_arr(char *arr, int n)
 }
 
 /**
- *main - print the multiplication of 2 numbers.
+ *main - Entry point
+ *print the multiplication of 2 numbers.
  *@argc: array length.
  *@argv: array.
  *Return: 0.
