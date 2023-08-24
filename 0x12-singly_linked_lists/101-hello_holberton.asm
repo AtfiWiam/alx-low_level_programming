@@ -1,18 +1,14 @@
-section .data
-	hello db "Hello, Holberton",0
-	newline db 10, 0  ; Newline character followed by null terminator
-	format db "%s%s",0
+SECTION .data
+	msg:	db "Hello, Holberton", 0
+	fmt:	db "%s", 10, 0
 
-section .text
-	global main
-	extern printf
-
-main:
-	push rbp
-	mov rdi, format
-	mov rsi, hello
-	mov rdx, newline  ; Adding the newline string to the output
-	call printf
-	pop rbp
-	ret
-
+SECTION .text
+extern printf
+global main
+	main:
+		mov esi, msg
+		mov edi, fmt
+		mov eax, 0
+		call printf
+		mov eax, 0
+		ret
