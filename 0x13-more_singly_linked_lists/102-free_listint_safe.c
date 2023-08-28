@@ -32,31 +32,39 @@ void free_listint_ptrs2(listptr_t **head)
 
 size_t free_listint_safe(listint_t **h)
 {
-	size_t count = 0;
-	listptr_t *head_ptrs, *curr_ptr;
-	listint_t *temp;
+	listptr_t *loop_tracker, *tracker_head, *tracker_node;
+	size_t num_nodes_freed = 0;
+	listint_t *current_node;
 
-	head_ptrs = NULL;
+	tracker_head = NULL;
+
 	while (*h != NULL)
 	{
-		curr_ptr = head_ptrs;
+		loop_tracker = malloc(sizeof(listptr_t));
 
-		while (curr_ptr != NULL)
+		if (loop_tracker == NULL)
+			exit(98);
+		loop_tracker->ptr = (void *)*h;
+		loop_tracker->next = tracker_head;
+		tracker_head = loop_tracker;
+		tracker_node = tracker_head;
+
+		while (tracker_node->next != NULL)
 		{
-			if (*h == curr_ptr->ptr)
+			tracker_node = tracker_node->next;
+			if (*h == tracker_node->ptr)
 			{
 				*h = NULL;
-				free_listint_ptrs2(&head_ptrs);
-				return (count);
+				free_listint_ptrs2(&tracker_head);
+				return (num_nodes_freed);
 			}
-			curr_ptr = curr_ptr->next;
 		}
-		temp = *h;
+		current_node = *h;
 		*h = (*h)->next;
-		temp->next = NULL;
-		free(temp);
-		count++;
+		free(current_node);
+		num_nodes_freed++;
 	}
-	free_listint_ptrs2(&head_ptrs);
-	return (count);
+	*h = NULL;
+	free_listint_ptrs2(&tracker_head);
+	return (num_nodes_freed);
 }
