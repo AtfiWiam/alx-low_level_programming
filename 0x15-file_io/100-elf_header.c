@@ -4,235 +4,95 @@
 #include <fcntl.h>
 #include <elf.h>
 
-void print_elf_info(char *magic);
-void print_elf_type(char *magic);
-void print_elf_osabi(char *magic);
-void print_elf_version(char *magic);
-void print_elf_data(char *magic);
-void print_elf_magic(char *magic);
-void check_elf_type(char *magic);
-int is_elf_file(char *magic);
-
 /**
- * print_elf_info - Prints the ELF header information.
- * @magic: magic pointer.
+ * print_elf_header_info - Print information from an ELF header.
+ * @header: Pointer to the ELF header structure.
  *
- * Return: nothing.
+ * This function prints various information contained in the ELF header,
+ * such as magic bytes, class, data format, version, OS/ABI, ABI version,
+ * type, and entry point address.
+ *
+ * Return : Nothing.
  */
 
-void print_elf_info(char *magic)
+void print_elf_header_info(Elf64_Ehdr *header)
 {
 	int i;
 
 	printf("Magic:   ");
 	for (i = 0; i < EI_NIDENT; i++)
 	{
-		printf("%02x", magic[i]);
+		printf("%02x", header->e_ident[i]);
 		if (i < EI_NIDENT - 1)
 			printf(" ");
 	}
 	printf("\n");
+	printf("Class:                             %s\n", header->e_ident[EI_CLASS]
+			== ELFCLASS32 ? "ELF32" : (header->e_ident[EI_CLASS]
+				== ELFCLASS64 ? "ELF64" : "Unknown"));
+	printf("Data:                              %s\n", header->e_ident[EI_DATA]
+			== ELFDATA2LSB ?
+			"2's complement, little endian" : (header->e_ident[EI_DATA]
+				== ELFDATA2MSB ?
+				"2's complement, big endian" : "Unknown"));
+	printf("Version:                           %d (current)\n",
+			header->e_ident[EI_VERSION]);
+	printf("OS/ABI:                            %d\n", header->e_ident[EI_OSABI]);
+	printf("ABI Version:                       %d\n",
+			header->e_ident[EI_ABIVERSION]);
+	printf("Type:                              %s\n", header->e_type == ET_REL ?
+			"REL (Relocatable file)" : (header->e_type == ET_EXEC ?
+				"EXEC (Executable file)" : (header->e_type == ET_DYN ?
+					"DYN (Shared object file)" : "Unknown")));
+	printf("Entry point address:               0x%lx\n",
+			(unsigned long)header->e_entry);
 }
 
 /**
- * print_elf_type - prints the ELF file type.
- * @magic: magic pointer.
+ * main - Entry point of the program.
+ * @argc: Number of command line arguments.
+ * @argv: Array of command line arguments.
  *
- * Return: nothing.
- */
-
-void print_elf_type(char *magic)
-{
-	Elf32_Ehdr *header = (Elf32_Ehdr *)magic;
-
-	printf("  Type:                              ");
-	switch (header->e_type)
-	{
-		case ET_NONE:
-			printf("NONE (No file type)\n");
-			break;
-		case ET_REL:
-			printf("REL (Relocatable file)\n");
-			break;
-		case ET_EXEC:
-			printf("EXEC (Executable file)\n");
-			break;
-		case ET_DYN:
-			printf("DYN (Shared object file)\n");
-			break;
-		case ET_CORE:
-			printf("CORE (Core file)\n");
-			break;
-		default:
-			printf("<unknown: %x>\n", header->e_type);
-			break;
-	}
-}
-
-/**
- * print_elf_osabi - prints the ELF OS/ABI and ABI version.
- * @magic: magic pointer.
+ * This function is the main entry point of the program. It opens an ELF file,
+ * reads its header, and then prints information from the ELF header using the
+ * print_elf_header_info function.
  *
- * Return: nothing.
+ * Return: Always 0.
  */
-
-void print_elf_osabi(char *magic)
-{
-	char osabi = magic[EI_OSABI];
-
-	printf("OS/ABI:  ");
-	switch (osabi)
-	{
-		case ELFOSABI_SYSV:
-			printf("UNIX - System V\n");
-			break;
-		case ELFOSABI_NETBSD:
-			printf("UNIX - NetBSD\n");
-			break;
-		case ELFOSABI_SOLARIS:
-			printf("UNIX - Solaris\n");
-			break;
-		default:
-			printf("<unknown: %x>\n", osabi);
-			break;
-	}
-	printf("ABI Version: %d\n", magic[EI_ABIVERSION]);
-}
-
-/**
- * print_elf_version - prints the ELF version.
- * @magic: magic pointer.
- *
- * Return: nothing.
- */
-
-void print_elf_version(char *magic)
-{
-	int version = magic[EI_VERSION];
-
-	printf("Version: ");
-	if (version == EV_CURRENT)
-		printf("%d (current)\n", version);
-	else
-		printf("%d\n", version);
-}
-
-/**
- * print_elf_data - prints the ELF data format.
- * @magic: magic pointer.
- *
- * Return: nothing.
- */
-
-void print_elf_data(char *magic)
-{
-	char data = magic[EI_DATA];
-
-	printf("Data:    2's complement");
-	if (data == ELFDATA2LSB)
-		printf(", little endian\n");
-	else if (data == ELFDATA2MSB)
-		printf(", big endian\n");
-}
-
-/**
- * print_elf_magic - prints the ELF magic bytes.
- * @magic: magic pointer.
- *
- * Return: nothing.
- */
-
-void print_elf_magic(char *magic)
-{
-	int bytes;
-
-	printf("Magic:   ");
-	for (bytes = 0; bytes < 16; bytes++)
-	{
-		printf(" %02x", magic[bytes]);
-	}
-	printf("\n");
-}
-
-/**
- * check_elf_type - checks the ELF file type.
- * @magic: magic pointer.
- *
- * Return: nothing.
- */
-
-void check_elf_type(char *magic)
-{
-	char syst = magic[EI_CLASS] + '0';
-
-	if (syst == '0')
-		exit(98);
-	printf("ELF Header:\n");
-	print_elf_magic(magic);
-	if (syst == '1')
-		printf("  Class:                             ELF32\n");
-	if (syst == '2')
-		printf("  Class:                             ELF64\n");
-	print_elf_data(magic);
-	print_elf_version(magic);
-	print_elf_osabi(magic);
-	print_elf_type(magic);
-}
-
-/**
- * is_elf_file - checks if it is an ELF file.
- * @magic: magic pointer.
- *
- * Return: 1 if it is an ELF file, 0 if not.
- */
-
-int is_elf_file(char *magic)
-{
-	char E = magic[EI_MAG1], L = magic[EI_MAG2], F = magic[EI_MAG3];
-	int address = (int)magic[EI_MAG0];
-
-	if (address == ELFMAG0 && E == ELFMAG1 && L == ELFMAG2 && F == ELFMAG3)
-		return (1);
-	return (0);
-}
-
-/**
- * main - Entry point for the ELF header program.
- * @argc: Number of command-line arguments.
- * @argv: Array of command-line argument strings.
- *
- * Return: 0 on success, or an error code if there's an issue.
- */
-
 int main(int argc, char *argv[])
 {
-	char magic[27];
-	int fd, ret_read;
+	int fd = open(argv[1], O_RDONLY);
+	Elf64_Ehdr header;
 
 	if (argc != 2)
 	{
-		dprintf(STDERR_FILENO, "Usage: elf_header elf_filename\n");
-		exit(98);
+		dprintf(STDERR_FILENO, "Usage: %s elf_filename\n", argv[0]);
+		return (98);
 	}
-	fd = open(argv[1], O_RDONLY);
-	if (fd < 0)
+	if (fd == -1)
 	{
-		dprintf(STDERR_FILENO, "Error: Can't open file %s\n", argv[1]);
-		exit(98);
+		dprintf(STDERR_FILENO, "Error: Cannot open file '%s'\n", argv[1]);
+		return (98);
 	}
-	lseek(fd, 0, SEEK_SET);
-	ret_read = read(fd, magic, 27);
-	if (ret_read == -1)
+	if (read(fd, &header, sizeof(header)) != sizeof(header))
 	{
-		dprintf(STDERR_FILENO, "Error: Can't read from file %s\n", argv[1]);
-		exit(98);
+		dprintf(STDERR_FILENO, "Error: Cannot read ELF header from file '%s'\n",
+				argv[1]);
+		close(fd);
+		return (98);
 	}
-	if (!is_elf_file(magic))
+	if (header.e_ident[EI_MAG0] != ELFMAG0 ||
+			header.e_ident[EI_MAG1] != ELFMAG1 ||
+			header.e_ident[EI_MAG2] != ELFMAG2 ||
+			header.e_ident[EI_MAG3] != ELFMAG3)
 	{
-		dprintf(STDERR_FILENO, "Error: %s is not an ELF file\n", argv[1]);
-		exit(98);
+		dprintf(STDERR_FILENO, "Error: '%s' is not an ELF file\n", argv[1]);
+		close(fd);
+		return (98);
 	}
-	check_elf_type(magic);
+
+	print_elf_header_info(&header);
 	close(fd);
 	return (0);
+
 }
