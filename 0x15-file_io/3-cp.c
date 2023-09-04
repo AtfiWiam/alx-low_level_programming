@@ -2,9 +2,6 @@
 
 #define BUFFER_SIZE 1024
 
-int copy_file(const char *source, const char *destination);
-void handle_error(const char *message, int exit_code);
-
 /**
 * main - program that copies the content of a file to another file
 * @argc: num argument
@@ -14,75 +11,40 @@ void handle_error(const char *message, int exit_code);
 
 int main(int argc, char *argv[])
 {
-	if (argc != 3)
-	{
-		dprintf(2, "Usage: %s file_from file_to\n", argv[0]);
-		return (97);
-	}
-	if (copy_file(argv[1], argv[2]) == -1)
-		return (99);
-	return (0);
-}
-
-/**
- * copy_file - function to handle the file copying logic
- * @source : pointer to source file to be copied.
- * @destination : pointer to destination file.
- *
- * Return : (0) on success or (-1) failure
- */
-
-int copy_file(const char *source, const char *destination)
-{
-	int fd_source, fd_destination;
-	ssize_t bytes_read, bytes_written;
+	int source_fd, destination_fd;
+	int bytes_read = 1024, bytes_written = 0;
 	char buffer[BUFFER_SIZE];
 
-	fd_source = open(source, O_RDONLY);
-	if (fd_source == -1)
+	if (argc != 3)
+		dprintf(STDERR_FILENO, "Usage: cp file_from file_to\n");
+	source_fd = open(argv[1], O_RDONLY);
+	if (source_fd == -1)
 	{
-		handle_error("Error: Can't read from file", 98);
-		return (-1);
+		dprintf(STDERR_FILENO, "Error: Can't read from file %s\n", argv[1]);
+		exit(98);
 	}
-	fd_destination = open(destination, O_WRONLY | O_CREAT | O_TRUNC, 0664);
-	if (fd_destination == -1)
+	destination_fd = open(argv[2], O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR
+			| S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
+	if (destination_fd == -1)
 	{
-		handle_error("Error: Can't write to file", 99);
-		close(fd_source);
-		return (-1);
+		dprintf(STDERR_FILENO, "Error: Can't write to %s\n", argv[2]);
+		close(source_fd), exit(99);
 	}
-	while ((bytes_read = read(fd_source, buffer, sizeof(buffer))) > 0)
+	while (bytes_read == 1024)
 	{
-		bytes_written = write(fd_destination, buffer, bytes_read);
-		if (bytes_written == -1 || bytes_written != bytes_read)
+		bytes_read = read(source_fd, buffer, BUFFER_SIZE);
+		if (bytes_read == -1)
 		{
-			handle_error("Error: Can't write to file", 99);
-			close(fd_source);
-			close(fd_destination);
-			return (-1);
+			dprintf(STDERR_FILENO, "Error: Can't read from file %s\n", argv[1]);
+			exit(98);
 		}
+		bytes_written = write(destination_fd, buffer, bytes_read);
+		if (bytes_written < bytes_read)
+			dprintf(STDERR_FILENO, "Error: Can't write to %s\n", argv[2]);
 	}
-	if (bytes_read == -1)
-	{
-		handle_error("Error: Can't read from file", 98);
-		close(fd_source);
-		close(fd_destination);
-		return (-1);
-	}
-	close(fd_source);
-	close(fd_destination);
+	if (close(source_fd) == -1)
+		dprintf(STDERR_FILENO, "Error: Can't close fd %d\n", source_fd);
+	if (close(destination_fd) == -1)
+		dprintf(STDERR_FILENO, "Error: Can't close fd %d\n", destination_fd);
 	return (0);
-}
-
-/**
- * handle_error - function to handle error messages and exit codes
- * @message : message to be printed
- * @exit_code : exit code
- * return : nothing
- */
-
-void handle_error(const char *message, int exit_code)
-{
-	dprintf(2, "%s\n", message);
-	exit(exit_code);
 }
