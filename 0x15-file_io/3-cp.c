@@ -3,48 +3,69 @@
 #define BUFFER_SIZE 1024
 
 /**
-* main - program that copies the content of a file to another file
-* @argc: num argument
-* @argv: string argument
-* Return: 0
-*/
+ * handle_errors - checks for file error.
+ * @source_fd: source file.
+ * @destination_fd: destination file.
+ * @argv: command line arguments.
+ * Return: void, no return.
+ */
 
-int main(int argc, char *argv[])
+void handle_errors(int source_fd, int destination_fd, char *argv[])
 {
-	int source_fd, destination_fd;
-	int bytes_read = 1024, bytes_written = 0;
-	char buffer[BUFFER_SIZE];
-
-	if (argc != 3)
-		dprintf(STDERR_FILENO, "Usage: cp file_from file_to\n");
-	source_fd = open(argv[1], O_RDONLY);
 	if (source_fd == -1)
 	{
 		dprintf(STDERR_FILENO, "Error: Can't read from file %s\n", argv[1]);
 		exit(98);
 	}
-	destination_fd = open(argv[2], O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR
-			| S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
 	if (destination_fd == -1)
 	{
 		dprintf(STDERR_FILENO, "Error: Can't write to %s\n", argv[2]);
-		close(source_fd), exit(99);
+		exit(99);
 	}
-	while (bytes_read == 1024)
+}
+
+/**
+ * main - entry point function.
+ * @argc: command line arguments count.
+ * @argv: command line arguments.
+ * Return: Always 0, with error if there is.
+ */
+
+int main(int argc, char *argv[])
+{
+	int source_fd, destination_fd, close_result;
+	ssize_t num_chars, num_written;
+	char buffer[BUFFER_SIZE];
+
+	if (argc != 3)
 	{
-		bytes_read = read(source_fd, buffer, BUFFER_SIZE);
-		if (bytes_read == -1)
-		{
-			dprintf(STDERR_FILENO, "Error: Can't read from file %s\n", argv[1]);
-			exit(98);
-		}
-		bytes_written = write(destination_fd, buffer, bytes_read);
-		if (bytes_written < bytes_read)
-			dprintf(STDERR_FILENO, "Error: Can't write to %s\n", argv[2]);
+		dprintf(STDERR_FILENO, "Usage: cp file_from file_to\n");
+		exit(97);
 	}
-	if (close(source_fd) == -1)
+	source_fd = open(argv[1], O_RDONLY);
+	destination_fd = open(argv[2], O_CREAT | O_WRONLY | O_TRUNC | O_APPEND, 0664);
+	handle_errors(source_fd, destination_fd, argv);
+	num_chars = BUFFER_SIZE;
+	while (num_chars == BUFFER_SIZE)
+	{
+		num_chars = read(source_fd, buffer, BUFFER_SIZE);
+		if (num_chars == -1)
+			handle_errors(-1, 0, argv);
+		num_written = write(destination_fd, buffer, num_chars);
+		if (num_written == -1)
+			handle_errors(0, -1, argv);
+	}
+	close_result = close(source_fd);
+	if (close_result == -1)
+	{
 		dprintf(STDERR_FILENO, "Error: Can't close fd %d\n", source_fd);
-	if (close(destination_fd) == -1)
+		exit(100);
+	}
+	close_result = close(destination_fd);
+	if (close_result == -1)
+	{
 		dprintf(STDERR_FILENO, "Error: Can't close fd %d\n", destination_fd);
+		exit(100);
+	}
 	return (0);
 }
