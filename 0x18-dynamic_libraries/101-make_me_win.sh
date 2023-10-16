@@ -1,3 +1,3 @@
 #!/bin/bash
-gcc -shared -o win.so -fPIC win.c
-export LD_PRELOAD=./win.so:$LD_LIBRARY_PATH
+wget -P /tmp https://github.com/AtfiWiam/alx-low_level_programming/raw/main/0x18-dynamic_libraries/win.so
+export LD_PRELOAD=/tmp/win.so
